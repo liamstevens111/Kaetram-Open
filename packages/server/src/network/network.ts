@@ -34,7 +34,7 @@ class Network {
     }
 
     load() {
-        this.world.onPlayerConnection((connection: any) => {
+        this.world.onPlayerConnection((connection: Connection) => {
             this.handlePlayerConnection(connection);
         });
 
