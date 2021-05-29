@@ -67,13 +67,8 @@ class Handler {
             this.player.checkRegions();
 
             this.detectAreas(x, y);
-
-
-            /*this.detectMusic(x, y);
-            this.detectOverlay(x, y);
             this.detectLights(x, y);
-            this.detectAchievements(x, y);
-            this.detectCamera(x, y);*/
+
             this.detectClipping(x, y);
         });
 
@@ -132,7 +127,7 @@ class Handler {
                     );
             }
 
-            this.world.removePlayer(this.player);
+            this.world.entities.removePlayer(this.player);
         });
 
         this.player.onTalkToNPC((npc: NPC) => {

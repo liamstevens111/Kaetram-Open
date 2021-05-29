@@ -11,10 +11,10 @@ export default class Chest extends Areas {
 
         super.load(this.data, (chestArea: Area, rawData: any) => {
             chestArea.maxEntities = rawData.entities || 0;
-            chestArea.items = rawData.items.split(',');
+            chestArea.items = rawData.items;
 
-            chestArea.cx = rawData.cx;
-            chestArea.cy = rawData.cy;
+            chestArea.cx = rawData.spawnX;
+            chestArea.cy = rawData.spawnY;
 
             if (rawData.achievement)
                 chestArea.achievement = rawData.achievement;
@@ -34,11 +34,11 @@ export default class Chest extends Areas {
     spawnChest(chestArea: Area) {
         if (Utils.timePassed(chestArea.lastSpawn, chestArea.spawnDelay)) return;
 
-        chestArea.chest = this.world.spawnChest(
+        chestArea.chest = this.world.entities.spawnChest(
             chestArea.items,
             chestArea.cx,
             chestArea.cy,
-            null, false
+            false, null
         );
 
         chestArea.lastSpawn = Date.now();
@@ -47,7 +47,7 @@ export default class Chest extends Areas {
     removeChest(chestArea: Area) {
         if (!chestArea.chest) return;
 
-        this.world.removeChest(chestArea.chest);
+        this.world.entities.removeChest(chestArea.chest);
         
         chestArea.chest = null;
     }

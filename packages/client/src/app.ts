@@ -110,7 +110,7 @@ export default class App {
 
         this.git.on('click', () => this.displayScroll('git'));
 
-        this.rememberMe.on('change', () => {
+        this.rememberMe.on('input', () => {
             if (!this.game?.storage) return;
 
             const active = this.rememberMe.prop('checked');
@@ -160,9 +160,7 @@ export default class App {
                 $('#worlds-switch').on('click', () => $('#worlds-popup').toggle());
             });
 
-        $(document).on('keydown', (e) => {
-            if (e.which === Modules.Keys.Enter) return false;
-        });
+        $(document).on('keydown', (e) => e.which !== Modules.Keys.Enter);
 
         $(document).on('keydown', (e) => {
             const key = e.which || e.keyCode || 0;
@@ -170,6 +168,8 @@ export default class App {
             if (!this.game) return;
 
             this.body.trigger('focus');
+
+            if (key === Modules.Keys.Enter && !this.game.started) return this.login();
 
             if (this.game.started) this.game.handleInput(Modules.InputType.Key, key);
         });
@@ -212,6 +212,13 @@ export default class App {
         $('input[type="range"]').on('input', (_e, input: HTMLInputElement) =>
             this.updateRange($(input))
         );
+
+        if (!this.config.debug || location.hostname !== 'localhost')
+            $.ajax({
+                url: 'https://c6.patreon.com/becomePatronButton.bundle.js',
+                dataType: 'script',
+                async: true
+            });
     }
 
     public ready(): void {
@@ -224,8 +231,6 @@ export default class App {
 
     private login(): void {
         if (this.loggingIn || !this.loaded || this.statusMessage || !this.verifyForm()) return;
-
-        this.loaded = false;
 
         this.toggleLogin(true);
         this.game.connect();

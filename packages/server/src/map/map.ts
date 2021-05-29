@@ -11,15 +11,16 @@ import World from '../game/world';
 import Area from './areas/area';
 import Entity from '../game/entity/entity';
 import Spawns from '../../data/spawns.json';
+import Mobs from '../util/mobs';
+import NPCs from '../util/npcs';
+import Items from '../util/items';
 
 import Areas from './areas/areas';
 import AreasIndex from './areas/index';
 
 import log from '../util/log';
 
-let map: any;
-
-const mapDestination = path.resolve(__dirname, '../../data/map/world.json');
+import map from '../../data/map/world.json';
 
 class Map {
     world: World;
@@ -54,7 +55,7 @@ class Map {
     regionWidth: number;
     regionHeight: number;
 
-    areas: any;
+    areas: { [name: string]: Areas };
 
     staticEntities: any;
 
@@ -68,20 +69,10 @@ class Map {
 
         this.ready = false;
 
-        this.create();
         this.load();
 
         this.regions = new Regions(this);
         this.grids = new Grids(this);
-    }
-
-    create(jsonData?: any) {
-        try {
-            map = jsonData || JSON.parse(fs.readFileSync(mapDestination, {
-                encoding: 'utf8',
-                flag: 'r'
-            }));
-        } catch (e) { log.error('Could not create the map file.'); };
     }
 
     load() {
@@ -92,16 +83,16 @@ class Map {
         this.width = map.width;
         this.height = map.height;
         this.collisions = map.collisions;
-        this.chests = map.chests;
+        this.chests = map.areas.chest;
 
         this.loadStaticEntities();
 
         this.tilesets = map.tilesets;
-        this.lights = map.lights;
+        this.lights = map.areas.lights;
         this.plateau = map.plateau;
         this.objects = map.objects;
         this.cursors = map.cursors;
-        this.warps = map.warps;
+        this.warps = map.areas.warps;
 
         // Lumberjacking
         this.trees = map.trees;
@@ -115,7 +106,7 @@ class Map {
          * These are temporarily hardcoded,
          * but we will use a dynamic approach.
          */
-        this.regionWidth = 25;
+        this.regionWidth = 35;
         this.regionHeight = 25;
 
         this.checksum = Utils.getChecksum(JSON.stringify(map));
@@ -191,11 +182,14 @@ class Map {
 
         // Legacy static entities (from Tiled);
         _.each(map.staticEntities, (entity: any, tileIndex) => {
-            this.staticEntities.push({
+            let e = {
                 tileIndex: tileIndex,
                 string: entity.type,
-                roaming: entity.roaming
-            });
+                roaming: entity.roaming,
+                type: this.getEntityType(entity.type)
+            };
+
+            this.staticEntities.push(e);
         });
 
         _.each(Spawns, (data) => {
@@ -207,19 +201,28 @@ class Map {
                 roaming: data.roaming,
                 miniboss: data.miniboss,
                 achievementId: data.achievementId,
-                boss: data.boss
+                boss: data.boss,
+                type: this.getEntityType(data.string)
             });
         });
     }
 
-    indexToGridPosition(tileIndex: number) {
+    getEntityType(string: string) {
+        if (string in Mobs.Properties) return 'mob';
+        if (string in NPCs.Properties) return 'npc';
+        if (string in Items.Data) return 'item';
+
+        return null;
+    }
+
+    indexToGridPosition(tileIndex: number, offset = 0) {
         tileIndex -= 1;
 
         let x = this.getX(tileIndex + 1, this.width),
             y = Math.floor(tileIndex / this.width);
 
         return {
-            x: x,
+            x: x + offset,
             y: y
         };
     }
@@ -413,11 +416,27 @@ class Map {
 
         if (!warpName) return null;
 
-        let warp = this.warps[warpName.toLowerCase()];
+        let warp = this.getWarpByName(warpName.toLowerCase());
+
+        if (!warp) return;
 
         warp.name = warpName;
 
         return warp;
+    }
+
+    getWarpByName(name: string) {
+        console.log(this.warps);
+
+        for (let i in this.warps)
+            if (this.warps[i].name === name)
+                return _.cloneDeep(this.warps[i]);
+
+        return null;
+    }
+
+    getChestAreas(): Areas {
+        return this.areas['chests'];
     }
 
     isReady(callback: Function) {
