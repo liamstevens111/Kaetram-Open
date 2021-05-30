@@ -107,7 +107,7 @@ export default class ProcessMap {
             name: tileset.name,
             firstGID: tileset.firstgid,
             lastGID: tileset.firstgid + tileset.tilecount - 1,
-            imageName: tileset.image.includes('/') ? tileset.image.split('/')[2] : tileset.image,
+            imageName: tileset.image.includes('/') ? tileset.image.split('/')[tileset.image.length - 1] : tileset.image,
             scale: tileset.name === 'tilesheet' ? 2 : 1
         });
 

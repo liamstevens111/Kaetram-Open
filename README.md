@@ -138,7 +138,7 @@ directory.
 Example command:
 
 ```console
-yarn exportmap ./data/map.json
+yarn exportmap ./map/data/map.json
 ```
 
 To build the current game map, you can run

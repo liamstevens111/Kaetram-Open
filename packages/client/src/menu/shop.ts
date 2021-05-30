@@ -234,6 +234,7 @@ export default class Shop {
     }
 
     hide(): void {
+        this.remove();
         this.openShop = -1;
 
         this.sellSlot.css('background-image', '');
