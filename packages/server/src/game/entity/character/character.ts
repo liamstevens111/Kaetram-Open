@@ -141,7 +141,9 @@ class Character extends Entity {
 
             if (this.poison) return;
 
-            this.heal(1);
+            const healAmount = 3 + Math.floor(this.getMaxHitPoints() * 0.02);
+
+            this.heal(healAmount);
         }, this.healingRate);
     }
 
