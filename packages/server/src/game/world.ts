@@ -11,6 +11,7 @@ import Character from './entity/character/character';
 import Minigames from '../controllers/minigames';
 import Packets from '../network/packets';
 import Modules from '../util/modules';
+import Constants from '../util/constants';
 import Shops from '../controllers/shops';
 import Region from '../region/region';
 import GlobalObjects from '../controllers/globalobjects';
@@ -239,9 +240,26 @@ class World {
             character.combat.stop();
 
             if (!ignoreDrops) {
-                let drop = character.getDrop();
 
-                if (drop) this.entities.dropItem(drop.id, drop.count, deathX, deathY);
+                let drops = character.getDrop();
+
+                if (drops) {
+                    let maxRadius = Constants.MAX_DROP_RADIUS;
+                    let maxLayers = Constants.MAX_DROP_LAYERS;
+
+                    let validLocations = this.getGrids().getSurroundingValidDropCellCoords(deathX, deathY, maxRadius);
+
+                    for (let i = 0; i < maxLayers; i++) {
+                        if (drops.length === 0) break;
+                        
+                        for (let i = 0; i < validLocations.length; i++) {
+                            if (drops.length === 0) break;
+
+                            let currentDrop = drops.shift();
+                            this.entities.dropItem(currentDrop.id, currentDrop.count, validLocations[i].x, validLocations[i].y);
+                        }
+                    }
+                }
             }
         } else if (character.type === 'player') character.die();
     }

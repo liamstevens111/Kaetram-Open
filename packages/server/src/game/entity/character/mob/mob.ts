@@ -98,18 +98,28 @@ class Mob extends Character {
     getDrop() {
         if (!this.drops) return null;
 
-        let random = Utils.randomInt(0, Constants.DROP_PROBABILITY),
-            dropObjects = Object.keys(this.drops),
-            item = dropObjects[Utils.randomInt(0, dropObjects.length - 1)];
+        let itemsToDrop = [];
 
-        if (random > this.drops[item]) return null;
+        for (let drop of this.drops) {
+            let random = Utils.randomInt(1, drop.chance);
 
-        let count = item === 'gold' ? Utils.randomInt(this.level, this.level * 5) : 1;
+            if (random !== 1) continue;
 
-        return {
-            id: Items.stringToId(item),
-            count: count
-        };
+            let count = drop.name === 'gold'
+                    ? Utils.randomInt(
+                          Math.ceil(drop.amount / 2),
+                          Math.floor(drop.amount + drop.amount / 2)
+                      )
+                    : drop.amount;
+
+            if (count <= 0) continue;
+
+            itemsToDrop.push({ id: Items.stringToId(drop.name), count: count });
+        }
+
+        if (!(Array.isArray(itemsToDrop) && itemsToDrop.length > 0)) return null;
+
+        return itemsToDrop;
     }
 
     getProjectileName() {
