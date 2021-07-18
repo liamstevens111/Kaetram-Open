@@ -770,7 +770,7 @@ export default class Renderer {
                 this.drawText(`Level ${entity.level}`, x, y, true, colour, '#000');
 
             if (entity.type === 'item') {
-                if (entity.count > 1) this.drawText(entity.count.toString(), x, y, true, colour);
+                if (entity.count > 1) this.drawText(entity.count.toString(), x, y + ( Math.floor(entity.sprite.height / 3)), true, colour);
 
                 if (entity.ability > -1)
                     this.drawText(

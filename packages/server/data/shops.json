@@ -1,10 +1,10 @@
 {
   "0": {
     "npcId": 44,
-    "items": [1, 4, 190, 264],
-    "count": [100, 100, 100, 0],
-    "prices": [100, 200, 50, 20],
-    "currency": 202,
+    "items": [1, 2],
+    "count": [100, 10],
+    "prices": [10, 100],
+    "currency": 3,
     "stockDuration": 60000
   }
 }

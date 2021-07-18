@@ -362,3 +362,5 @@ $RECYCLE.BIN/
 # .pnp.*
 
 # End of https://www.toptal.com/developers/gitignore/api/git,node,yarn,macos,linux,windows,webstorm,visualstudiocode,vim,emacs
+packages/tools/map/processmap.ts
+

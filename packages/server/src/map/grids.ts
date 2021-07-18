@@ -79,6 +79,41 @@ class Grids {
         return entities;
     }
 
+    getSurroundingValidDropCellCoords(startX: number, startY: number, radius?: number) {
+        let dropCellCoords = [];
+
+        for (let i = 0; i <= radius; i++) {
+            for (let y = startY - i; y < startY + i + 1; y++) {
+                if (y < 0) continue;  
+                if (y >= this.map.height) break;
+                for (let x = startX - i; x < startX + i + 1; x += Math.abs(y - startY) === i ? 1 : i * 2) {
+                    if (x < 0) continue;
+                    if (x >= this.map.width) break;
+
+                    if (
+                        !this.map.isEmpty(x, y) &&
+                        !this.map.isColliding(x, y) &&
+                        !this.map.isDoor(x, y)
+                    ) {
+                        let cell = this.entityGrid[y][x];
+                        let canDropOnEntity = true;
+
+                        if (_.size(cell) > 0) {
+                            _.each(cell, (entity: Entity) => {
+                                canDropOnEntity = !(entity.isPlayer() || entity.isItem());
+                            });
+                        }
+
+                        if (canDropOnEntity) {
+                            dropCellCoords.push({'x': x, 'y': y});
+                        }
+                    }
+                }
+            }
+        }
+        return dropCellCoords;
+    }
+
     checkBounds(x: number, y: number, radius?: number) {
         return (
             x + radius < this.map.width &&
